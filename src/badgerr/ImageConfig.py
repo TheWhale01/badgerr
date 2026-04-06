@@ -1,5 +1,7 @@
+import requests
 from enum import Enum
 from dataclasses import dataclass
+from requests import RequestException
 
 class Position(Enum):
     TOP = "top"

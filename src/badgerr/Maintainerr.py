@@ -20,13 +20,13 @@ class Maintainerr:
         if not self._api_key:
             raise BadgerEnvironmentVariableMissingException("MAINTAINERR_API_KEY environment variable is missing.")
 
-    def get_collections(self) -> Generator[Any, Any, None]:
+    def _get_collections(self) -> Generator[Any, Any, None]:
         response: Response = self._http_session.get(f'{self._url}/api/collections')
         response.raise_for_status()
         for item in response.json():
             yield item
 
-    def get_items_in_collection(self, collection_id: str) -> Generator[Any, Any, None]:
+    def _get_items_in_collection(self, collection_id: str) -> Generator[Any, Any, None]:
         response: Response = self._http_session.get(f'{self._url}/api/collections/media', params={
             'collectionId': collection_id
         })
@@ -36,7 +36,7 @@ class Maintainerr:
 
     def get_tracked_items(self) -> set[str]:
         items: set[str] = set()
-        for collection in self.get_collections():
-            for item in self.get_items_in_collection(collection.get('id')):
+        for collection in self._get_collections():
+            for item in self._get_items_in_collection(collection.get('id')):
                 items.add(item.get('mediaServerId'))
         return items
