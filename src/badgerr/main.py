@@ -20,7 +20,7 @@ def main():
     maintainerr: Maintainerr = Maintainerr()
     jellyfin: Jellyfin = Jellyfin()
     config: ImageConfig = ImageConfig(
-        text="LEAVING SOON !",
+        text="Leaving Soon",
         text_color="#FFFFFF",
         text_background_color="#E50914",
         position=Position.TOP,
@@ -29,16 +29,22 @@ def main():
         img_padding_x=50,
         img_padding_y=100,
         background_opacity=0,
+        font_size=150,
         background_color="#000000"
     )
-    img_engine: ImageProcess = ImageProcess()
-    img_engine.get_font("https://github.com/ryanoasis/nerd-fonts/raw/refs/heads/master/patched-fonts/RobotoMono/SemiBold/RobotoMonoNerdFont-SemiBold.ttf", config)
-    filename: str = "/home/hades/code/badgerr/test.png"
-    try:
-        for collection in maintainerr.get_collections():
-            for media in maintainerr.get_items_in_collection(collection.get('id')):
-                img: bytes = img_engine.apply_overlay(jellyfin.get_media_image(media.get('mediaServerId')), config)
-                img_engine.write_img_file(img, filename)
-                return
-    except Exception:
-        os.remove(filename)
+    img_engine: ImageProcess = ImageProcess(os.getenv("FONT_URL", ""), config)
+    badgerr_items: set[str] = jellyfin.get_tagged_items()
+    maintainerr_items: set[str] = maintainerr.get_tracked_items()
+    for item in (badgerr_items - maintainerr_items):
+        try:
+            jellyfin.restore_original_image(item)
+        except Exception as e:
+            logger.error(f'Failed to restore the original poster for {item}: {e}')
+    for item in (maintainerr_items - badgerr_items):
+        try:
+            new_image: bytes = img_engine.apply_overlay(jellyfin.get_item_image(item))
+            jellyfin.upload_image(item, new_image)
+            break
+        except Exception as e:
+            logger.error(f'An error occured for item {item}: {e}. Restoring poster.')
+            jellyfin.restore_original_image(item)
