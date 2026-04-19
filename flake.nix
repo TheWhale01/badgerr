@@ -77,6 +77,11 @@
        	  default = "badgerr-overlay";
        	  description = "Name of the tag used to retrieve media inside Jellyfin.";
        	};
+        fontUrl = lib.mkOption {
+          type = lib.types.str;
+          default = "https://github.com/ryanoasis/nerd-fonts/raw/refs/heads/master/patched-fonts/RobotoMono/SemiBold/RobotoMonoNerdFont-SemiBold.ttf";
+          description = "Url of the font for the overlay.";
+        };
        	environmentFile = lib.mkOption {
        	  type = lib.types.path;
        	  default = null;
@@ -87,6 +92,33 @@
        	  default = {};
        	  description = "Describes the style and position of the overlay to add to Jellyfin media posters.";
        	};
+      };
+      config = lib.mkIf cfg.enable {
+        users.users.${cfg.user} = {
+          isSystemUser = true;
+          group = "${cfg.user}";
+          description = "Service user for badgerr.";
+        };
+        users.groups.${cfg.group} = {};
+      };
+      systemd.services.badgerr = {
+        description = "Automatically apply overlay on Jellyfin based on Maintainerr's collections";
+        wantedBy = [ "multi-user.target" ];
+        after = [ "network.target" ];
+        script = "${virtualEnv}/bin/badgerr";
+        startAt = "daily";
+        serviceConfig = {
+          Type = "oneshot";
+          User = "${cfg.user}";
+          Group = "${cfg.group}";
+          Environment = {
+            JELLYFIN_URL = cfg.jellyfinUrl;
+            MAINTAINERR_URL = cfg.maintainerrUrl;
+            FONT_URL = cfg.fontUrl;
+            BADGERR_TAGNAME = cfg.tagname;
+          };
+          EnvironmentFile = cfg.environmentFile;
+        };
       };
     };
   };

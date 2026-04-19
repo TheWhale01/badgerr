@@ -22,5 +22,4 @@ def main():
         logger.warning("Could not find .env file.")
     print(args.config)
     badgerr: Badgerr = Badgerr(args)
-    # badgerr.run()
-    badgerr.full_cleanup()
+    badgerr.run()
