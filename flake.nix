@@ -46,7 +46,7 @@
     };
     nixosModules.default = { config, lib, pkgs, ... }:
     let
-      format = pkgs.format.yaml {};
+      format = pkgs.formats.yaml {};
       cfg = config.services.badgerr;
     in
     {
@@ -100,24 +100,24 @@
           description = "Service user for badgerr.";
         };
         users.groups.${cfg.group} = {};
-      };
-      systemd.services.badgerr = {
-        description = "Automatically apply overlay on Jellyfin based on Maintainerr's collections";
-        wantedBy = [ "multi-user.target" ];
-        after = [ "network.target" ];
-        script = "${virtualEnv}/bin/badgerr";
-        startAt = "daily";
-        serviceConfig = {
-          Type = "oneshot";
-          User = "${cfg.user}";
-          Group = "${cfg.group}";
-          Environment = {
-            JELLYFIN_URL = cfg.jellyfinUrl;
-            MAINTAINERR_URL = cfg.maintainerrUrl;
-            FONT_URL = cfg.fontUrl;
-            BADGERR_TAGNAME = cfg.tagname;
+        systemd.services.badgerr = {
+          description = "Automatically apply overlay on Jellyfin based on Maintainerr's collections";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "network.target" ];
+          script = "${virtualEnv}/bin/badgerr --config ${format.generate "badgerr-config.yaml" cfg.settings}";
+          startAt = "daily";
+          serviceConfig = {
+            Type = "oneshot";
+            User = "${cfg.user}";
+            Group = "${cfg.group}";
+            Environment = [
+              "JELLYFIN_URL=${cfg.jellyfinUrl}"
+              "MAINTAINERR_URL=${cfg.maintainerrUrl}"
+              "FONT_URL=${cfg.fontUrl}"
+              "BADGERR_TAGNAME=${cfg.tagname}"
+            ];
+            EnvironmentFile = cfg.environmentFile;
           };
-          EnvironmentFile = cfg.environmentFile;
         };
       };
     };
