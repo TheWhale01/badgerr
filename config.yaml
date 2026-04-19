@@ -1,0 +1,14 @@
+text:
+  font_size: 150
+  value: "Leaving Soon"
+  color: "#ffffff"
+  background_color: "#e50914"
+  padding_x: 40
+  padding_y: 40
+
+position: "top"
+
+image:
+  background_color: "#000000"
+  background_opacity: 0
+  padding_y: 100

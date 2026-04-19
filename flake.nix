@@ -41,8 +41,53 @@
         virtualEnv
       ];
       shellHook = ''
-        ln -sf ${virtualEnv} .venv
+        ln -sf ${virtualEnv} ./.venv
       '';
+    };
+    nixosModules.default = { config, lib, pkgs, ... }:
+    let
+      format = pkgs.format.yaml {};
+      cfg = config.services.badgerr;
+    in
+    {
+      options.services.badgerr = {
+        enable = lib.mkEnableOption "Whether to enable the badgerr service.";
+        user = lib.mkOption {
+       	  type = lib.types.str;
+       	  default = "badgerr";
+       	  description = "User to run the service as.";
+       	};
+        group = lib.mkOption {
+       	  type = lib.types.str;
+       	  default = "badgerr";
+       	  description = "Group to run the service as.";
+       	};
+        jellyfinUrl = lib.mkOption {
+       	  type = lib.types.str;
+       	  default = "http://127.0.0.1:8096";
+       	  description = "Url of your jellyfin server.";
+       	};
+        maintainerrUrl = lib.mkOption {
+       	  type = lib.types.str;
+       	  default = "http://127.0.0.1:6246";
+       	  description = "Url of your maintainerr service.";
+       	};
+       	tagname = lib.mkOption {
+       	  type = lib.types.str;
+       	  default = "badgerr-overlay";
+       	  description = "Name of the tag used to retrieve media inside Jellyfin.";
+       	};
+       	environmentFile = lib.mkOption {
+       	  type = lib.types.path;
+       	  default = null;
+       	  description = "Environment file to declare secrets like JELLYFIN_API and MAINTAINERR_API.";
+       	};
+       	settings = lib.mkOption {
+       	  type = format.type;
+       	  default = {};
+       	  description = "Describes the style and position of the overlay to add to Jellyfin media posters.";
+       	};
+      };
     };
   };
 }

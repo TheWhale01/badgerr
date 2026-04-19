@@ -1,33 +1,30 @@
 import os
+import yaml
 import logging
 import threading
 from logging import Logger
+from typing_extensions import Any
 from badgerr.Jellyfin import Jellyfin
 from badgerr.Maintainerr import Maintainerr
 from badgerr.ImageProcess import ImageProcess
 from concurrent.futures import ThreadPoolExecutor
-from badgerr.ImageConfig import ImageConfig, Position
+from badgerr.ImageConfig import ImageConfig
 
 class Badgerr:
-    def __init__(self):
+    def __init__(self, args: Any = None):
         self._maintainerr: Maintainerr = Maintainerr()
         self._jellyfin: Jellyfin = Jellyfin()
         self._logger: Logger = logging.getLogger('badger:Badger')
-        self._config: ImageConfig = ImageConfig(
-            text="Leaving Soon",
-            text_color="#FFFFFF",
-            text_background_color="#E50914",
-            position=Position.TOP,
-            text_padding_x=40,
-            text_padding_y=40,
-            img_padding_x=50,
-            img_padding_y=100,
-            background_opacity=0,
-            font_size=150,
-            background_color="#000000"
-        )
+        self._config = ImageConfig.loadyaml(self._parse_yaml(args.config))
         self._img_engine: ImageProcess = ImageProcess(os.getenv('FONT_URL', ''), self._config)
         self._local = threading.local()
+
+    def _parse_yaml(self, path: str):
+        if not path:
+            return
+        with open(path, 'r') as file:
+            config = yaml.safe_load(file)
+        return config
 
     def _get_local_jellyfin(self):
         if not hasattr(self._local, "jellyfin"):
