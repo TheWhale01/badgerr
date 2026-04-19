@@ -50,8 +50,8 @@ class Badgerr:
     def full_cleanup(self):
         badgerr_tagged_items: set[str] = self._jellyfin.get_tagged_items()
         maintainerr_tracked_items: set[str] = self._maintainerr.get_tracked_items()
-        for item in (badgerr_tagged_items | maintainerr_tracked_items):
-            self._restore_item(item)
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            executor.map(self._restore_item, (badgerr_tagged_items | maintainerr_tracked_items))
 
     def run(self):
         badgerr_tagged_items: set[str] = self._jellyfin.get_tagged_items()

@@ -20,6 +20,5 @@ def main():
     args = parse_args()
     if not load_dotenv(find_dotenv(usecwd=True)):
         logger.warning("Could not find .env file.")
-    print(args.config)
     badgerr: Badgerr = Badgerr(args)
     badgerr.run()

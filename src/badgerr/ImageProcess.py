@@ -53,7 +53,7 @@ class ImageProcess:
             x = self._config.img_padding_x + self._config.text_padding_x
             y = self._config.img_padding_y + self._config.text_padding_y
         elif self._config.position == Position.TOP_RIGHT:
-            x = int(self._img_width - self._text_width - self._config.img_padding_x - self._config.img_padding_x)
+            x = int(self._img_width - self._text_width - self._config.img_padding_x - self._config.text_padding_x)
             y = self._config.img_padding_y + self._config.text_padding_y
         elif self._config.position == Position.BOTTOM_LEFT:
             x = self._config.img_padding_x + self._config.text_padding_x

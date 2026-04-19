@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any
+from argparse import Namespace
 from dataclasses import dataclass
 
 class Position(Enum):
@@ -28,17 +28,19 @@ class ImageConfig:
     background_color: str = "#000000"
 
     @classmethod
-    def loadyaml(cls, config: Any):
+    def loadyaml(cls, config: Namespace):
+        text_block = config.get('text') or {}
+        image_block = config.get('image') or {}
         return cls(
-            text = config.get('text').get('value'),
-            position = config.get('position'),
-            text_padding_x = config.get('text').get('padding_x'),
-            text_padding_y = config.get('text').get('padding_y'),
-            text_background_color = config.get('text').get('background_color'),
-            img_padding_x = config.get('image').get('padding_x'),
-            img_padding_y = config.get('image').get('padding_y'),
-            font_size = config.get('text').get('font_size'),
-            text_color = config.get('text').get('color'),
-            background_opacity = config.get('image').get('background_opacity'),
-            background_color = config.get('image').get('background_color'),
+            text=text_block.get('value') or "",
+            position=Position(config.get('position')),
+            text_padding_x=int(text_block.get('padding_x') or 0),
+            text_padding_y=int(text_block.get('padding_y') or 0),
+            text_background_color=text_block.get('background_color') or "#000000",
+            img_padding_x=int(image_block.get('padding_x') or 0),
+            img_padding_y=int(image_block.get('padding_y') or 0),
+            font_size=int(text_block.get('font_size') or 50),
+            text_color=text_block.get('color') or "#FFFFFF",
+            background_opacity=float(image_block.get('background_opacity') or 0.0),
+            background_color=image_block.get('background_color') or "#000000",
         )
