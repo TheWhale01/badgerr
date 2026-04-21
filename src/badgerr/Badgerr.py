@@ -3,7 +3,7 @@ import yaml
 import logging
 import threading
 from logging import Logger
-from typing_extensions import Any
+from argparse import Namespace
 from badgerr.Jellyfin import Jellyfin
 from badgerr.Maintainerr import Maintainerr
 from badgerr.ImageProcess import ImageProcess
@@ -11,7 +11,7 @@ from concurrent.futures import ThreadPoolExecutor
 from badgerr.ImageConfig import ImageConfig
 
 class Badgerr:
-    def __init__(self, args: Any = None):
+    def __init__(self, args: Namespace = Namespace()):
         self._maintainerr: Maintainerr = Maintainerr()
         self._jellyfin: Jellyfin = Jellyfin()
         self._logger: Logger = logging.getLogger('badger:Badger')
